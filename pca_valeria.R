@@ -11,7 +11,7 @@ pacman :: p_load(tidyverse,
                  GGally, 
                  cptcity)
 
-fires <- read_csv("forestfires.csv") %>% 
+fires <- read_csv("fires_prueba.csv") %>% 
   print()
 
 fires %>% select(-c("X", "Y", "day"))
@@ -27,10 +27,11 @@ fires_pca_esc <- scale(fires_pca) %>% as_tibble() %>%
   print()
 
 #matriz de correlación
-correlation <- cor(fires_pca_esc)
+correlation <- cor(fires_pca_esc) %>% 
+  print()
 
 #matriz de varianza-covarianza
-matrix_cov <- cov(fires_pca_esc)
+matrix_cov <- cov(fires_pca_esc) %>% print()
 
 #suma de la diagonal o "varianza total"
 diag(matrix_cov) %>% sum() 
@@ -67,3 +68,26 @@ pca$c1
 
 library(factoextra)
 fviz_eig(pca,addlabels = T)
+
+levelplot(
+  as.matrix(pca$co),
+  col.regions =
+    cpt(
+      pal = "cb_div_RdBu_11", n = 100, rev = F
+    )
+)
+
+contrib <- as.matrix(pca$co ^ 2)
+
+library(corrplot)
+
+corrplot(contrib, is.corr = F)
+
+
+as.tibble(fires_pca_esc)
+head(pca$li) #ese li 
+dim(pca$li)
+
+output <- as.tibble(pca$li) %>% 
+  dplyr::select(sprintf("Axis%1$s", 1:3)) %>% 
+  print()
