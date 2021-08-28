@@ -4,7 +4,12 @@ library(PerformanceAnalytics)
 library(GGally)
 library(lattice)
 library(cptcity) #paleta de colores
-pacman :: p_load(tidyverse)
+pacman :: p_load(tidyverse, 
+                 lattice, 
+                 psych, 
+                 PerformanceAnalytics, 
+                 GGally, 
+                 cptcity)
 
 fires <- read_csv("forestfires.csv") %>% 
   print()

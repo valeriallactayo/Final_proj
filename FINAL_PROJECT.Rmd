@@ -29,12 +29,13 @@ Daniel Yauri Leiva | 17160208
 load("workspace.Rdata")
 ```
 ## LIBRERÍAS UTILIZADAS
-library(tidyverse)
-library(psych)
-library(PerformanceAnalytics)
-library(GGally)
-library(lattice)
-library(cptcity)
+pacman :: p_load(tidyverse, 
+                 lattice, 
+                 psych, 
+                 PerformanceAnalytics, 
+                 GGally, 
+                 cptcity,
+                 library(factoextra))
 
 ## ANÁLISIS EXPLORATORIO DE DATOS
 
@@ -44,3 +45,95 @@ library(cptcity)
 fires <- read_csv("forestfires.csv") %>% 
   print()
 ```
+
+```{r}
+fires %>% select(-c("X", "Y", "day"))
+```
+
+```{r}
+fires_pca <- select(fires, 5:13) %>% 
+  print()
+```
+
+#describiendo los datos
+```{r}
+describe(fires_pca)
+```
+
+#esttandarizando
+```{r}
+fires_pca_esc <- scale(fires_pca) %>% as_tibble() %>% 
+  print()
+```
+
+#matriz de correlación
+
+```{r}
+correlation <- cor(fires_pca_esc)
+```
+
+#matriz de varianza-covarianza
+
+```{r}
+matrix_cov <- cov(fires_pca_esc)
+```
+
+#suma de la diagonal o "varianza total"
+
+```{r}
+diag(matrix_cov) %>% sum() 
+```
+
+```{r}
+chart.Correlation(fires_pca_esc, histogram = T, pch = 20)
+```
+
+```{r}
+levelplot(
+  correlation,
+  col.regions = 
+    cpt(
+      pal = "cb_div_RdBu_11", n = 100
+    )
+)
+```
+
+#calculando eigenvectors y eigenvalues
+
+```{r}
+eigen <- eigen(matrix_cov) %>% print()
+```
+
+#calculando el pca
+
+```{r}
+library(ade4)
+pca <- dudi.pca(fires_pca_esc, 
+                scale = F, 
+                scannf = F,
+                nf = ncol(fires_pca_esc)
+)
+```
+
+```{r}
+summary(pca)
+```
+
+```{r}
+pca$eig
+```
+
+```{r}
+sum(pca$eig)
+```
+
+#autovectores
+```{r}
+pca$c1
+```
+
+
+```{r}
+fviz_eig(pca,addlabels = T)
+```
+
