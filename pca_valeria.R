@@ -14,7 +14,6 @@ pacman :: p_load(tidyverse,
 fires <- read_csv("fires_prueba.csv") %>% 
   print()
 
-fires %>% select(-c("X", "Y", "day"))
 
 fires_pca <- select(fires, 5:13) %>% 
   print()
