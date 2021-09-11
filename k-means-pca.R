@@ -65,6 +65,43 @@ library(ggplot2)
 ggplot(centroides_km3_2, aes(x=kmeans3, y=value, fill=variable))+
   geom_bar(stat="identity", position="dodge")
 
+# Variables originales
+
+c3$cluster
+
+fires_cluster <- 
+  fires_pca %>% 
+  mutate(
+    clust = c3$cluster
+  )
+
+fires_cluster
+fires_cluster$clust
+
+# VARIABLES POR CLUSTER 
+
+fires_long3 <- fires_cluster %>% gather(key = variable, value = valor, 1:7)
+
+ggplot(fires_long3, aes(x = as.factor(clust), y = valor)) +
+  geom_boxplot(aes(fill = variable)) +
+  geom_jitter(color="red", size = 0.2, alpha=0.2) +
+  theme_bw() +
+  labs(
+    title = "Distribución de variables por mes",
+    caption = "Elaboración propia") +
+  facet_wrap(~variable, scales = "free_y", 
+             strip.position = "top") + 
+  theme(legend.position = "left")
+
+
+library(ggplot2)
+g2 = ggplot(fifa3_centr_2, aes(x=kmeans4, y=value, fill=variable))+
+  geom_bar(stat="identity", position="dodge")
+g2
+
+library(plotly)
+ggplotly(g2)
+
 # Cluster con PCA
 
 cluster::clusplot(pca_data, c3$cluster, color=T, labels=2) 
@@ -96,6 +133,8 @@ scatter3d(x = pc$scores[,1], y = pc$scores[,2], z = pc$scores[,3],
           groups = c3_cluster_f, surface=FALSE, ellipsoid= TRUE)
 rglwidget() # grafico aparece en Viewer
 
+
+
 # Validación
 library(clusterSim)
 
@@ -106,6 +145,19 @@ val <- c3$cluster
 index <- index.DB(pca_data, val, centrotypes = "centroids")
 index$DB
 
+# Indice de Dunn
+
 library(clValid)
 dunn(distance = NULL, Data = pca_data, clusters = val)
+
+fires_cluster
+
+smoothScatter(spatial_data$Y ~ spatial_data$X,
+              colramp = colorRampPalette(palette),
+              ylim = c(9, 2))
+
+ggplot(spatial_data, aes(X, Y)) +
+  geom_point(aes(col = clust),ylim = c(9,1)) +
+  ylim = 9:1
+  theme(ylim = 9:1)
 

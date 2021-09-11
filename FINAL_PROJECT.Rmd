@@ -26,149 +26,540 @@ Daniel Yauri Leiva | 17160208
 
 ```{r }
 #Comenzaremos subiendo los datos que usaremos
-load("workspace.Rdata")
+load("prep_eda.RData")
 ```
-## LIBRERÍAS UTILIZADAS
-pacman :: p_load(tidyverse, 
-                 lattice, 
-                 psych, 
-                 PerformanceAnalytics, 
-                 GGally, 
-                 cptcity,
-                 library(factoextra))
+
 
 ## ANÁLISIS EXPLORATORIO DE DATOS
 
-## ANÁLISIS DE COMPONENTES PRINCIPALES
-
-```{r}
-fires <- read_csv("forestfires.csv") %>% 
-  print()
+```{r results = 'hide', warning = FALSE, message = FALSE}
+# Librerias
+library(tidyverse)
+library(VIM)
+library(skimr)
+library(psych)
+library(GGally)
+library(visdat)
+library(plotly)
+library(viridis)
+library(hrbrthemes)
 ```
 
 ```{r}
-fires %>% select(-c("X", "Y", "day"))
+
+# Dataset
+
+fires
+
 ```
 
 ```{r}
-fires_pca <- select(fires, 5:13) %>% 
-  print()
+
+# Resumenes estadísticos
+
+summary(fires)
+describe(fires)
 ```
 
+**Cantidad de Missing Values**
+
+```{r, echo =FALSE, warning = FALSE, message = FALSE}
+
+# Missing Values
+
+na_g1 <- VIM::aggr(fires, numbers = T, sortVars = T)
+```
+
+**Distribución espacial de incendios**
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Distribución espacial
+
+palette <- hcl.colors(30, palette = "inferno")
+
+smoothScatter(fires$Y ~ fires$X,
+              colramp = colorRampPalette(palette),
+              ylim = c(9, 2))
+```
+****
+**Distribución de cantidad de incendios por mes**
+****
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+# Distribución de cantidad de incendios por mes
+
+incendios_g
+```
+****
+
+**Pieplot de cantidad de incendios por mes**
+
+****
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+# Pieplot de cantidad de incendios por mes
+
+library(ggrepel)
+
+fires_mes <- 
+  fires %>% 
+  dplyr::group_by(
+    month
+  ) %>% 
+  dplyr::summarize(
+    value = n(),
+    porc = round((n()/517)*100,1)
+  )
+
+df <- fires_mes %>% 
+  mutate(csum = rev(cumsum(rev(porc))), 
+         pos = porc/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), porc/2, pos))
+
+pie <- ggplot(df, aes(x = "" , y = porc, fill = fct_inorder(month))) +
+  geom_col(width = 1, color = 1) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set3") +
+  geom_label_repel(data = df,
+                   aes(y = pos, label = paste0(porc, "%")),
+                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+  guides(fill = guide_legend(title = "Mes")) +
+  theme_void()
+
+pie
+```
+**Distribución de variables por boxplot**
+```{r,echo=FALSE, warning = FALSE, message = FALSE}
+# Distribución de variables por boxplot
+
+library(reshape2)
+
+fires_long2 <- melt(fires_ars %>% 
+                      dplyr::select(
+                        -c(X, Y)
+                      ))
+
+g1 <- ggplot(fires_long2, aes(x = variable, y = value)) +
+  geom_boxplot(aes(fill = variable)) +
+  geom_jitter(color="red", size = 0.2, alpha=0.2) +
+  theme_bw() +
+  labs(
+    title = "Distribución de variables por mes",
+    caption = "Elaboración propia") +
+  facet_wrap(~month, scales = "free_y", 
+             strip.position = "top") + 
+  theme(legend.position = "left")
+
+g1
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Distribución de variables por densidad
+
+library(ggridges)
+
+ggplot(fires_long2, aes(x = value, y = variable)) +
+  geom_density_ridges() +
+  facet_wrap(~month, scales = "free")
+
+ggplot(fires_long2, aes(x = value, y = variable, fill = stat(quantile))) +
+  stat_density_ridges(quantile_lines = FALSE,
+                      calc_ecdf = TRUE,
+                      geom = "density_ridges_gradient") +
+  scale_fill_brewer(name = "") +
+  facet_wrap(~month, scales = "free")
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Boxplot áreas por mes
+
+ggplot(fires, aes(x = month, y = area)) +
+  geom_boxplot(aes(fill = month, alpha = 0.5)) +
+  geom_jitter(color="red", size=1.5, alpha=0.5, width = 0.1) +
+  theme_ipsum_tw() +
+  facet_wrap(~month, scales = "free") +
+  labs(
+    title = "Áreas quemadas por mes",
+    subtitle = "Áreas en hectáreas",
+    caption = "Elaboración propia"
+  ) +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  theme(legend.position = "none")
+```
+
+```{r, eval=FALSE}
+# Boxplot áreas != 0.0 ha
+
+fires_ars <-
+  fires %>% 
+  dplyr::filter(
+    area >= 1
+  ) %>% 
+  dplyr::select(-rain)
+```
+
+```{r}
+summary(fires_ars)
+describe(fires_ars)
+```
+
+```{r, warning = FALSE, message = FALSE}
+ggplot(fires_ars, aes(x = month, y = area)) +
+  geom_boxplot(aes(fill = month, alpha = 0.5)) +
+  geom_jitter(color="red", size=1.5, alpha=0.5, width = 0.1) +
+  theme_ipsum_tw() +
+  facet_wrap(~month, scales = "free") +
+  labs(
+    title = "Áreas quemadas significativas por mes",
+    subtitle = "Áreas mayores a 0 hectáreas",
+    caption = "Elaboración propia"
+  ) +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+# Boxplot temperatura por mes
+
+ggplot(fires, aes(x = month, y = temp)) +
+  geom_boxplot(aes(fill = month, alpha = 0.5)) +
+  geom_jitter(color="red", size=1.5, alpha=0.3, width = 0.1) +
+  theme_ipsum_tw() +
+  facet_wrap(~month, scales = "free") +
+  labs(
+    title = "Temperatura por mes",
+    subtitle = "Temperatura en °C",
+    caption = "Elaboración propia"
+  ) +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  theme(legend.position = "none")
+
+ggplot(fires_ars, aes(x = month, y = area)) +
+  geom_boxplot(aes(fill = month, alpha = 0.5)) +
+  geom_jitter(color="red", size=1.5, alpha=0.5, width = 0.1) +
+  theme_ipsum_tw() +
+  facet_wrap(~month, scales = "free") +
+  labs(
+    title = "Áreas quemadas significativas por mes",
+    subtitle = "Áreas mayores a 0 hectáreas",
+    caption = "Elaboración propia"
+  ) +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+# Boxplot áreas por mes eliminando datos atípicos
+
+ggplot(fires_arss, aes(x = month, y = area)) +
+  geom_boxplot(aes(fill = month, alpha = 0.5)) +
+  geom_jitter(color="red", size=1.5, alpha=0.3, width = 0.1) +
+  theme_ipsum_tw() +
+  facet_wrap(~month, scales = "free") +
+  labs(
+    title = "Áreas por mes sin datos atípicos",
+    subtitle = "Temperatura en °C",
+    caption = "Elaboración propia"
+  ) +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  theme(legend.position = "none")
+```
+
+```{r, warning = FALSE, message = FALSE}
+library(ggridges)
+
+ggplot(fires, aes(x = temp, y = month, fill = stat(x))) +
+  geom_density_ridges_gradient(quantile_lines = TRUE, alpha = 0.75,
+                               quantiles = c(0.05, 0.5, 0.95)) +
+  scale_fill_viridis_c(name = "T (°C)", option = "C") +
+  theme_ipsum() +
+  labs(x = "Temperatura", y = "Mes")
+```
+
+```{r}
+# Data filtrada por el periodo de mayor ocurrencia de incendios
+
+fires_per # Se consideran áreas de 0 ha
+```
+
+```{r, warning = FALSE, message = FALSE}
+fires_pa <- 
+  fires_per %>% 
+  dplyr::filter(
+    area > 0.00
+  )
+
+ggplot(fires_pa, aes(x = "Aug - Sep", y = area)) +
+  geom_boxplot() +
+  geom_jitter(color="red", size=1.5, alpha=0.5) +
+  theme_ipsum_tw() +
+  labs(
+    title = "Áreas para el periodo Aug - Sep",
+    subtitle = "Áreas mayores a 0 hectáreas",
+    caption = "Elaboración propia"
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r, warning = FALSE, message = FALSE}
+
+fires_pap <- # Sin contar areas > 600 ha
+  fires_pa %>% 
+  dplyr::filter(
+    area < 600
+  )
+```
+
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+g4
+```
+
+
+**Data para procesamiento**
+```{r, warning = FALSE, message = FALSE}
+# Data para procesamiento
+
+fires_pca
+```
+
+
+**Matriz de correlación**
+```{r, warning = FALSE, message = FALSE}
+  # Matriz de correlación
+
+ggpairs(fires_area[,-c(1:3, 12)])
+
+cor(fires_area[, -c(1:3, 12)])
+corrplot::corrplot(cor(fires_area[, -c(1:3, 12)]))
+
+cor_fires <- cor(fires_area[-c(1:3, 12)])
+cor.plot(cor_fires, order = "hclust")
+```
+
+## PCA
+
+```{r, warning = FALSE, message = FALSE}
+#cargando los datos 
+
+fires_pca
+```
+
+```{r, warning = FALSE, message = FALSE}
 #describiendo los datos
-```{r}
-describe(fires_pca)
-```
+library(corrplot)
+library(PerformanceAnalytics)
+library(lattice)
+library(cptcity)
+library(cluster)
 
-#esttandarizando
-```{r}
-fires_pca_esc <- scale(fires_pca) %>% as_tibble() %>% 
+
+describe(fires_pca)
+
+#ploteo
+
+
+#esttandarizando los datos
+fires_esc <- scale(fires_pca) %>% as_tibble() %>% 
   print()
-```
+
 
 #matriz de correlación
+correlation <- cor(fires_esc) %>% 
+  print()
 
-```{r}
-correlation <- cor(fires_pca_esc)
-```
+#obteniendo la matríz de correlación
+corrplot(correlation, 
+         method = "number", 
+         type = "full",
+         diag = TRUE,
+         tl.col = "black", 
+         bg = "white", 
+         title = "Correlation Matrix", 
+         col = NULL)
 
 #matriz de varianza-covarianza
+matrix_cov <- cov(fires_esc) %>% print()
 
-```{r}
-matrix_cov <- cov(fires_pca_esc)
-```
 
 #suma de la diagonal o "varianza total"
-
-```{r}
 diag(matrix_cov) %>% sum() 
-```
 
-```{r}
-chart.Correlation(fires_pca_esc, histogram = T, pch = 20)
-```
+chart.Correlation(fires_esc, histogram = T, pch = 20)
 
-```{r}
-levelplot(
-  correlation,
-  col.regions = 
-    cpt(
-      pal = "cb_div_RdBu_11", n = 100
-    )
-)
-```
+# levelplot(
+#   correlation,
+#   col.regions = 
+#     cpt(
+#       pal = "cb_div_RdBu_11", n = 100
+#     )
+# )
 
 #calculando eigenvectors y eigenvalues
 
-```{r}
 eigen <- eigen(matrix_cov) %>% print()
-```
 
 #calculando el pca
-
-```{r}
 library(ade4)
-pca <- dudi.pca(fires_pca_esc, 
+
+pca <- dudi.pca(fires_esc, 
                 scale = F, 
                 scannf = F,
-                nf = ncol(fires_pca_esc)
+                nf = ncol(fires_esc)
 )
-```
-
-```{r}
 summary(pca)
-```
 
-```{r}
+#viendo los autovalores
 pca$eig
-```
 
-```{r}
+#verificando que la suma de los autovalores sea 7
 sum(pca$eig)
-```
 
-#autovectores
-```{r}
+#viendo los autovectores
 pca$c1
-```
+
+#Scree plot 
+
+library(factoextra)
+
+fviz_screeplot(pca, 
+               addlabels = TRUE,
+               barfill = "lightblue1",
+               barcolor = "lightblue1",
+               linecolor= "indianred2",
+               ggtheme = theme_grey())
+
+#correlacion entre las variable soriginales y las componetes
+levelplot(
+  as.matrix(pca$co),
+  col.regions =
+    cpt(
+      pal = "cb_div_RdBu_11", n = 100, rev = F
+    ),
+  xlab = "Variables",
+  ylab = "Componentes"
+)
+
+#Varianza explicada o contribución de las variables
+contrib <- as.matrix(pca$co ^ 2)
+
+#Gráfico de contribución 
+
+corrplot(contrib,
+         method = "circle",
+         tl.col = "black", 
+         bg = "white", 
+         title = "Contributions", 
+         is.corr = F)
 
 
-```{r}
-fviz_eig(pca,addlabels = T)
+
+as.tibble(fires_esc)
+head(pca$li) 
+dim(pca$li)
+
+#df de componentes principales
+pca_data <- as_tibble(pca$li) %>% 
+  dplyr::select(sprintf("Axis%1$s", 1:3)) %>% 
+  print()
+
+
+
+library(FactoMineR)
+
+
+fviz_pca_ind(pca, col.var  = "cos2", 
+             geom.ind = "point",
+             col.ind = "royalblue3",
+             labelsize = 3,
+             repel = FALSE,
+             ggtheme = theme_grey())
+
+fviz_pca_biplot(pca, col.var  = "cos2", 
+             geom.var = "arrow",
+             geom.ind = "point",
+             repel = FALSE,
+             addEllipses = TRUE,
+             col.ind = "tomato2",
+             ggtheme = theme_grey(),
+             title = "PCA BIPLOT")
+
+library(rgl)
+
+pc <- plot_ly(pca_data, x = ~Axis1, y = ~Axis2, z = ~Axis3, color = "blue")
+print(pc)
+
+#Visualización en 3d 
+library(pca3d)
+prc <- prcomp(fires_esc, scale.=F)
+
+pca3d(prc, components = 1:3, 
+      col = "royalblue1", 
+      bg = "gray31",
+      axes.color = "sandybrown",
+      new = TRUE)
+rglwidget()
+
+#distancias
+pca3d(prc, components = 1:3, 
+      col = "royalblue1", 
+      bg = "black",
+      axes.color = "sandybrown",
+      show.shadows = TRUE,
+      new = TRUE)
+rglwidget()
+
+#elipse
+pca3d(prc, components = 1:3, 
+      col = "royalblue1", 
+      bg = "white",
+      axes.color = "sandybrown",
+      show.ellipses=TRUE,
+      ellipse.ci=0.9, show.plane=FALSE,
+      new = TRUE)
+rglwidget()
+
+
 ```
 
 ## CLUSTER JERARQUICO
 
 #Matriz de distancias
+Para este caso se usará la distancia euclideana, por ser la que mejor se acomoda a los nuestros datos.
 ```{r}
 distancia<- dist(pca_data, method = "euclidean")
-d <- as.matrix(distancia)
+
 ```
 
 #Heatmap
+Como una visualizacion previa de lo que podria ser el numero de clusters, se desarrolla el heatmap, no sin antes haber convertido a matriz nuestra data de distancia.
 ```{r}
+d <- as.matrix(distancia)
 heatmap(d)
 fviz_dist(dist.obj = distancia, lab_size = 10, 
           gradient = list(low = "#FC4E07", mid = "white", high = "#00AFBB"))
 ```
 
 #clusterizando con el metodo ward
+Para este caso se utilizará una técnica de clusterizacion jerarquica, con la técnica Ward D, el cual trabaja con las sumatorias de la distancia al centroide.
 ```{r}
 hmodel<- hclust(distancia, method = "ward.D")
 ```
 
 #dendograma
+Se plotea el dendograma para darnos una idea de como se agrupan nuestras observaciones en cada cluster, y la cantidad de estas.
 ```{r}
 plot(hmodel)
 ```
 
 #obteniendo las alturas
+Para definir el corte del dendograma, necesitamos hallar la altura del corte, para eso extraemos la columna de alturas del hmodel.
 ```{r}
 names <- "height"
 heights <- as.data.frame(hmodel$height) #hay 28 alturas
 ```
 
 #ploteando las alturas
+Ploteamos el grafico de alturas y observaciones y definimos que el punto de quiebre se da a partir de la observacion numero 30, lo que significa que este modelo agrupa la data en 3 clusters.
 ```{r}
 ggplot(heights, aes(x = index(heights), y = hmodel$height)) +
   geom_line(color = "royalblue2",    # Color de la linea
@@ -198,7 +589,7 @@ table(clust)
 
 #visualizando los grupo en el dendograma
 ```{r}
-fviz_dend(hmodel, k = 3, # Cortar en 4 grupos
+fviz_dend(hmodel, k = 3, # Cortar en 3 grupos
           cex = 0.5, # Tamaño de las etiquetas
           k_colors = c("#2E9FDF", "#00AFBB", "#E7B800"),
           color_labels_by_k = TRUE, # color labels by groups
@@ -221,7 +612,7 @@ fviz_cluster(list(data = pca_data, cluster = clust),
 library(cluster)
 ```
 
-#boxplot, caracterizacion de clusters
+#Uniendo el numero de cluster al data frame
 ```{r}
 col <- c("#2E9FDF", "#00AFBB", "#E7B800")
 data2 <- dplyr::bind_cols(pca_data, cluster = as.numeric(clust))
@@ -232,5 +623,198 @@ data2 <- dplyr::bind_cols(pca_data, cluster = as.numeric(clust))
 library(plotly)
 hmodel3d <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
                marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
-print(fig)
+hmodel3d
 ```
+
+
+## K-MEANS
+```{r, warning = FALSE, message = FALSE}
+library(car)
+library(scatterplot3d)
+```
+
+```{r, warning = FALSE, message = FALSE}
+
+pca_data
+
+# Indicadores para K óptimo
+
+# Valor de silueta
+
+set.seed(2021)
+fviz_nbclust(
+  pca_data, kmeans, method = "silhouette",
+  k.max = 15
+)
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Valor de suma de cuadrados totales
+
+set.seed(2021)
+fviz_nbclust(
+  pca_data, kmeans, method = "wss",
+  k.max = 15
+)
+```
+
+```{r, warning = FALSE, message = FALSE}
+# NbClust for determining the best number of clusters
+
+library(NbClust)
+
+nb <- NbClust::NbClust(pca_data,
+                       distance = "euclidean",
+                       min.nc = 2, max.nc = 20,
+                       method = "kmeans",
+                       index = "all")
+
+fviz_nbclust(nb)
+
+nb$Best.nc # Valores máximos de cada indicador
+```
+
+```{r, warning = FALSE, message = FALSE}
+# K-means
+
+set.seed(2021)
+c3 = kmeans(pca_data, centers = 3, iter.max = 100,
+            nstart = 100)
+
+c3$cluster
+c3$centers
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Silueta por cada cluster
+
+silueta <- cluster::silhouette(c3$cluster, dist(pca_data))
+
+fviz_silhouette(silueta)
+```
+
+```{r, warning = FALSE, message = FALSE}
+#Gráfico de clusters basados en sus centroides
+
+centroides_c3 = data.frame(c3$centers)
+
+centroides_c3$kmeans3 = 1:3
+
+library(reshape)
+centroides_km3_2 = reshape::melt(centroides_c3, id=c("kmeans3"))
+
+str(centroides_km3_2)
+
+library(ggplot2)
+ggplot(centroides_km3_2, aes(x=kmeans3, y=value, fill=variable))+
+  geom_bar(stat="identity", position="dodge")
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Cluster con PCA
+
+cluster::clusplot(pca_data, c3$cluster, color=T, labels=2) 
+```
+
+```{r, warning = FALSE, message = FALSE}
+# * grafico en 3D ----
+
+pc = princomp(fires_pca_esc, cor = T, scores = T)
+ls(pc)
+head(pc$scores)
+class(head(pc$scores))
+pca_data
+
+summary(pc)
+
+biplot(pc)
+
+#install.packages('rgl')
+library(rgl)
+
+plot3d(pc$scores[, 1:3], col = c4$cluster, size = 10)
+rglwidget() # grafico aparece en Viewer
+
+c3_cluster_f = as.factor(c3$cluster) #En factor para graficar con scatter
+c3_cluster_f
+
+scatter3d(x = pc$scores[,1], y = pc$scores[,2], z = pc$scores[,3],
+          xlab = "PC1", ylab = "PC2" , zlab = "PC3",
+          groups = c3_cluster_f, surface=FALSE)
+rglwidget() # grafico aparece en Viewer
+
+# Validación
+
+library(clusterSim)
+
+# Indice Davies - Boulding
+
+val <- c3$cluster
+
+index <- index.DB(pca_data, val, centrotypes = "centroids")
+index$DB
+
+# Indice Dunn
+
+library(clValid)
+dunn(distance = NULL, Data = pca_data, clusters = val)
+```
+
+```{r, warning = FALSE, message = FALSE}
+# Variables originales
+
+c3$cluster
+
+fires_cluster <- 
+  fires_pca %>% 
+  mutate(
+    clust = c3$cluster
+  )
+
+fires_cluster
+table(fires_cluster$clust)
+```
+
+
+
+## CLUSTER HKMEANS
+
+```{r, warning = FALSE, message = FALSE}
+#Hkmeans -----------------
+# Compute hierarchical k-means clustering
+library(factoextra)
+
+hkmodel <-hkmeans(pca_data, 3)
+hkmodel$centers
+# Elements returned by hkmeans()
+names(hkmodel)
+
+# Visualize the tree
+fviz_dend(hkmodel, cex = 0.6, palette = "jco",
+          rect = TRUE, rect_border = "jco", rect_fill = TRUE)
+
+# Visualize the hkmeans final clusters
+
+fviz_cluster(hkmodel,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"),
+             ellipse.type = "convex", # Concentration ellipse
+             repel = TRUE, # Avoid label overplotting (slow)
+             show.clust.cent = TRUE, 
+             ggtheme = theme_minimal()
+)
+
+length(hkmodel$cluster)
+head(hkmodel$data)
+table(hkmodel$cluster)
+
+library(plotly)
+datahk <- dplyr::bind_cols(hkmodel$data, cluster = as.numeric(clust))
+
+hkmodel <- plot_ly(datahk, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+               marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
+hkmodel
+```
+
+
+
+
