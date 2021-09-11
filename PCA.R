@@ -254,91 +254,25 @@ fviz_dend(hmodel, k = 3, # Cut in four groups
 #visualizando los grupos
 
 fviz_cluster(list(data = pca_data, cluster = clust),
-             palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"),
              ellipse.type = "convex", # Concentration ellipse
              repel = TRUE, # Avoid label overplotting (slow)
              show.clust.cent = TRUE, ggtheme = theme_minimal()
 )
 
 
-#convertimos nuestra data a amtriz
-library(rgl)
-library(viridis)
-library("RColorBrewer")
-col <- colorRampPalette(brewer.pal(10, "RdYlBu"))(256)
-distancia2<- as.matrix(distancia)
-heatmap(distancia2, color = col)
-
-
-col <- colorRampPalette(brewer.pal(50, "RdYlBu"))(256)
-heatmap(distancia2)
 
 library(cluster)
 
 #boxplot
 #boxplot, caracterizacion de clusters
-col <- c("#E69F00","#56B4E9","#009E73","#F0E442")
-data2 <- dplyr::bind_cols(scale(pca_data), cluster = clust)
-boxplot(
-  data2$Axis1 ~ data2$cluster,
-  col = col
-)
+col <- c("#2E9FDF", "#00AFBB", "#E7B800")
+data2 <- dplyr::bind_cols(scale(pca_data), cluster = as.numeric(clust))
 
-#KMEANS ------------------
-
-# Indicadores para K óptimo
-
-# Valor de silueta
-
-set.seed(2021)
-fviz_nbclust(
-  pca_data, kmeans, method = "silhouette",
-  k.max = 20
-)
-
-# Valor de suma de cuadrados totales
-
-set.seed(2021)
-fviz_nbclust(
-  pca_data, kmeans, method = "wss",
-  k.max = 15
-)
-
-# NbClust for determining the best number of clusters
-
-library(NbClust)
-
-nb <- NbClust::NbClust(pca_data,
-                       distance = "euclidean",
-                       min.nc = 2, max.nc = 20,
-                       method = "kmeans",
-                       index = "all")
-fviz_nbclust(nb)
-
-autoplot(kmeans(fires_pca_esc, 3), data = fires_pca_esc)
-
-smoothScatter(fires$Y ~ fires$X,
-              colramp = colorRampPalette(palette),
-              ylim = c(9, 2))
-
-set.seed(2021)
-c4 = kmeans(pca_data, centers = 3, iter.max = 100,
-            nstart = 100)
-
-# Silueta por cada cluster
-
-silueta <- cluster::silhouette(c4$cluster, dist(pca_data))
-
-fviz_silhouette(silueta)
 #Hkmeans -----------------
 # Compute hierarchical k-means clustering
 library(factoextra)
 
-set.seed(2021)
-fviz_nbclust(
-  pca_data, kmeans, method = "silhouette",
-  k.max = 20
-)
 hkmodel <-hkmeans(pca_data, 3)
 hkmodel$centers
 # Elements returned by hkmeans()
@@ -349,30 +283,16 @@ fviz_dend(hkmodel, cex = 0.6, palette = "jco",
           rect = TRUE, rect_border = "jco", rect_fill = TRUE)
 
 # Visualize the hkmeans final clusters
-fviz_cluster(hkmodel, palette = "jco", repel = TRUE,
-             ggtheme = theme_classic())
+
+fviz_cluster(hkmodel,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"),
+             ellipse.type = "convex", # Concentration ellipse
+             repel = TRUE, # Avoid label overplotting (slow)
+             show.clust.cent = TRUE, 
+             ggtheme = theme_minimal()
+)
 
 length(hkmodel$cluster)
 table(hkmodel$cluster)
 
-
-#CLARA -------------
-clara_clus <- clara(pca_data, 5, metric = "euclidean", stand = TRUE,
-      samples = 5, pamLike = FALSE)
-
-library(cluster)
-library(factoextra)
-
-fviz_nbclust(pca_data, clara, method = "silhouette")+
-  theme_classic()
-
-fviz_cluster(clara_clus,
-             palette = c("#999999","#E69F00","#56B4E9","#009E73"), # color palette
-             ellipse.type = "t", # Concentration ellipse
-             geom = "point", pointsize = 1,
-             ggtheme = theme_classic()
-)
-
-library(cluster)
-autoplot(clara(pca_data, 4))
 
