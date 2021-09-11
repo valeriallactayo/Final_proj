@@ -235,35 +235,30 @@ ggplot(heights, aes(x = index(heights), y = hmodel$height)) +
 (hmodel$height)[30]
 
 #cortando el dendograma
-plot(hmodel)
+
 clust<- cutree(hmodel, k = 3)
-head(clust, n=3)#solo conservaremos 3 clusters
 length(clust)
+#numero de elementos en cada cluster
 table(clust)
 
-#coloring
-# Cut in 4 groups and color by groups
+#visualizando los grupo en el dendograma
+
 fviz_dend(hmodel, k = 3, # Cut in four groups
           cex = 0.5, # label size
-          k_colors = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
+          k_colors = c("#2E9FDF", "#00AFBB", "#E7B800"),
           color_labels_by_k = TRUE, # color labels by groups
-          rect = TRUE,# Add rectangle around groups
-          show_labels = FALSE
-)
+          rect = TRUE, # Add rectangle around groups
+          rect_border = c("#2E9FDF", "#00AFBB", "#E7B800"),
+          rect_fill = TRUE)
+
+#visualizando los grupos
 
 fviz_cluster(list(data = pca_data, cluster = clust),
              palette = c("#2E9FDF", "#00AFBB", "#E7B800", "#FC4E07"),
              ellipse.type = "convex", # Concentration ellipse
              repel = TRUE, # Avoid label overplotting (slow)
-             show.clust.cent = TRUE, ggtheme = theme_minimal())
-
-
-
-a <- rect.hclust(hmodel, k=4, border="red")
-
-#otra forma de clusterizar
-cluster::daisy(fires_pca_esc, metric = "euclidean", stand = F)
-cluster::diana(fires_pca_esc, metric = "euclidean", stand = F)
+             show.clust.cent = TRUE, ggtheme = theme_minimal()
+)
 
 
 #convertimos nuestra data a amtriz
