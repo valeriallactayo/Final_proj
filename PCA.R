@@ -148,12 +148,8 @@ fviz_pca_biplot(pca, col.var  = "cos2",
 library(rgl)
 
 
-plot3d( 
-  x=pca_data$`Axis1`, y=pca_data$`Axis2`, z=pca_data$`Axis3`, 
-  col = c("royalblue", "sienna2", "red"), 
-  type = 'p', 
-  size = 8,
-  xlab="Comp 1", ylab="Comp 2", zlab="Comp 3")
+pc <- plot_ly(pca_data, x = ~Axis1, y = ~Axis2, z = ~Axis3, color = "blue")
+print(pc)
 
 #Visualización en 3d 
 library(pca3d)
@@ -181,6 +177,7 @@ pca3d(prc, components = 1:3,
       show.ellipses=TRUE,
       ellipse.ci=0.9, show.plane=FALSE,
       new = TRUE)
+
 
 
 #CLUSTER ------------------------------------
@@ -269,6 +266,12 @@ library(cluster)
 col <- c("#2E9FDF", "#00AFBB", "#E7B800")
 data2 <- dplyr::bind_cols(scale(pca_data), cluster = as.numeric(clust))
 
+#visualizando en 3d
+library(plotly)
+fig <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+               marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
+print(fig)
+
 #Hkmeans -----------------
 # Compute hierarchical k-means clustering
 library(factoextra)
@@ -293,6 +296,17 @@ fviz_cluster(hkmodel,
 )
 
 length(hkmodel$cluster)
+head(hkmodel$hclust)
 table(hkmodel$cluster)
 
+library(plotly)
+datahk <- dplyr::bind_cols(scale(pca_data), cluster = as.numeric(clust))
+
+fig <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+               marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
+print(fig)
+
+p <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3, color=~cluster) %>%
+  add_markers(size=1)
+print(p)
 
