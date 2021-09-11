@@ -264,7 +264,7 @@ library(cluster)
 #boxplot
 #boxplot, caracterizacion de clusters
 col <- c("#2E9FDF", "#00AFBB", "#E7B800")
-data2 <- dplyr::bind_cols(scale(pca_data), cluster = as.numeric(clust))
+data2 <- dplyr::bind_cols(pca_data, cluster = as.numeric(clust))
 
 #visualizando en 3d
 library(plotly)
@@ -296,17 +296,15 @@ fviz_cluster(hkmodel,
 )
 
 length(hkmodel$cluster)
-head(hkmodel$hclust)
+head(hkmodel$data)
 table(hkmodel$cluster)
 
 library(plotly)
-datahk <- dplyr::bind_cols(scale(pca_data), cluster = as.numeric(clust))
+datahk <- dplyr::bind_cols(hkmodel$data, cluster = as.numeric(clust))
 
-fig <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+fig <- plot_ly(datahk, x = ~Axis1, y = ~Axis2, z = ~Axis3,
                marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
 print(fig)
 
-p <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3, color=~cluster) %>%
-  add_markers(size=1)
-print(p)
+
 
