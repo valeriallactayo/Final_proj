@@ -1,0 +1,26 @@
+---
+title: "CLARA"
+output: html_document
+---
+
+#Analisis de componentes principales...
+
+
+#CLARA
+```{r}
+library(FactoMineR)
+library(cluster)
+
+fviz_nbclust(pca_data, clara, method = "silhouette")+
+  theme_classic()
+
+clara.res <- clara(pca_data, 3, samples = 50, pamLike = TRUE)
+print(clara.res)
+
+fviz_cluster(clara.res,
+             ellipse.type = "t", # Concentration ellipse
+             geom = "point", pointsize = 1,
+             ggtheme = theme_classic()
+)
+
+```
