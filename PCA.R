@@ -214,13 +214,27 @@ hmodel<- hclust(distancia, method = "ward.D") #función rbase
 plot(hmodel)
 
 #obteniendo las alturas
-hmodel$height #hay 28 alturas
 
-#ploteando 
-plot(hmodel$height, type = "p")
-lines(hmodel$height)
+names <- "height"
+heights <- as.data.frame(hmodel$height) #hay 28 alturas
+
+#ploteando las alturas
+plot(hmodel$height, type = "p")+ lines(hmodel$height)
+
+ggplot(heights, aes(x = index(heights), y = hmodel$height)) +
+  geom_line(color = "royalblue2",    # Color de la línea
+            lwd = 1,      # Ancho de la línea
+            linetype = 1) +
+  geom_vline(xintercept=30, color = "orange") +
+  geom_point(color = "royalblue4")+ labs( x = "Observaciones", y = "Altura",
+          title ="Visualización de alturas")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+#Obteniendo el valor de la altura
+
 (hmodel$height)[30]
 
+#cortando el dendograma
 plot(hmodel)
 clust<- cutree(hmodel, k = 3)
 head(clust, n=3)#solo conservaremos 3 clusters
