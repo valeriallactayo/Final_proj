@@ -1,8 +1,8 @@
 ---
-title: "Curso de cartografía automatizada sesión 001"
-subtitle: "<img src='img/antony.png'><br/>UNMSM <br/>Antony Barja"
-author: 'Geographer Freelance <br/><br/> <img src="img/github3.png" width="34" height="34" style="float: none;" /><a href="https://github.com/barja8" > barja8.github</a>'
-date: "Lima, 2019-09-09"
+title: "Proyecto de fin de semestre: Analisis Exploratorio de datos de incendios forestales"
+subtitle: "<img src='img/california-incendios.jpg'><br/>UNMSM <br/>Curso de programación"
+author: 'Llactayo, Romualdo, Sulcaray, Victorio, Yauri <br/><br/> <img src="img/github3.png" width="34" height="34" style="float: none;" /><a href="https://github.com/barja8" > barja8.github</a>'
+date: "Lima, 2019-11-09"
 output:
   xaringan::moon_reader:
     css: my-theme.css
@@ -21,33 +21,35 @@ options(htmltools.dir.version = FALSE)
 
 background-size: cover
 class: center, middle, inverse
-# Aspectos generales de los Sistemas de Información Geográfica
+# Objetivo del proyecto
 ---
-# ¿Qué es un GIS o SIG?
+# ¿Qué buscamos lograr en nuestro proyecto?
 
 .pull-left[
 <br>
-Es un sistema que integra tecnología informática, personas e información geográfica y cuya principal función es capturar, analizar, almacenar, editar y representar datos georreferenciados (**Olaya,2014**).
+Realizar el analisis multivariado a los datos de incendios forestales obtenidos de  (**Cortez,2007**), en el Parque Nacional Montesion, Portugal.
 <br>
 <br>
-**Desde un perpectiva técnica**:
+**Procesos realizados**:
 <br>
-`Es un conjunto de herramientas que nos permite manipular, gestionar y trabajar información georreferenciada.`
+*Análisis Exploratorio de datos
+* Análisis de componentes principales
+*Análisis cluster
 
-##### _Mas información_ [aquí](http://volaya.github.io/libro-sig/)
+##### _Mas información_ [aquí](https://www.researchgate.net/publication/238767143_A_Data_Mining_Approach_to_Predict_Forest_Fires_using_Meteorological_Data)
 ]
 
 .pull-left[
 
-![](img/Olaya.jpg)
+![](img/california-incendios.jpg)
 
 ]
 <!-- class: inverse, center, middle -->
 ---
-# Componentes de un SIG
+# Nuestros datos 
 
 ```{r,echo=FALSE, out.width= 850 ,out.height= 520, fig.align='center'}
-knitr::include_graphics("img/comp.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -67,12 +69,12 @@ Diseña algo que no existe todavía, mayor peso a la **parte estética**
 
 .pull-right[
 ```{r,echo=FALSE,out.width = "300px",fig.align='center'}
-knitr::include_graphics("img/sig.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 <br>
 <br>
 ```{r,echo=FALSE,out.width = "300px",fig.align='center'}
-knitr::include_graphics("img/cad.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 ---
@@ -80,7 +82,7 @@ knitr::include_graphics("img/cad.gif")
 Son todos los datos que presentan un sistema de referencia de coordenadas (src).
 
 ```{r,echo=FALSE,out.width = "650px",fig.align='center'}
-knitr::include_graphics("img/latlon.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -95,7 +97,7 @@ Son todos los datos que presentan geolocalización, es decir presentan un SRC.
 <br>
 
 ```{r,echo=FALSE,fig.align='center', out.height=400}
-knitr::include_graphics("img/datsp.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -103,7 +105,7 @@ knitr::include_graphics("img/datsp.png")
 Son **formas geométricas** (punto, linea y poligonos) que representan a los elementos geográficos que existen en el territorio
 
 ```{r,echo=FALSE,fig.align='center', out.height=400}
-knitr::include_graphics("img/vector.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -111,7 +113,7 @@ knitr::include_graphics("img/vector.png")
 Son **matrices de valores**, donde la unidad mínima es el pixel, y este contiene información geolocalizada de tipo continua.
 
 ```{r,echo=FALSE,fig.align='center', out.height=400}
-knitr::include_graphics("img/raster.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -139,7 +141,7 @@ En conclusión:
 ##### **SON TODAS LAS OPERACIONES QUE SE REALIZAN CON DATOS GEOGRÁFICOS**.
 .pull-down[
 ```{r,echo=FALSE,out.width = "350px",fig.align='center'}
-knitr::include_graphics("img/geopro.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 
@@ -149,7 +151,7 @@ knitr::include_graphics("img/geopro.gif")
 # Geoprocesamiento de datos vectoriales
 
 ```{r,echo=FALSE,fig.align='center',out.height=400}
-knitr::include_graphics("img/geo_vec.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 
@@ -157,7 +159,7 @@ knitr::include_graphics("img/geo_vec.png")
 # Geoprocesamiento de datos raster
 
 ```{r,echo=FALSE,fig.align='center', out.height=400}
-knitr::include_graphics("img/geo_raster.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
   
 ---
@@ -170,7 +172,7 @@ class: center, middle, inverse
 Open Source Geospatial Foundation, es una organización no gubernamental sin fines de lucro **cuya misión es apoyar y promover el desarrollo colaborativo de software, datos y educación geoespacial de código abierto**.
 
 ```{r,echo=FALSE}
-knitr::include_graphics("img/osgeo.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ##### _Mas información_ [aquí](https://www.osgeo.org/projects/)
@@ -179,7 +181,7 @@ knitr::include_graphics("img/osgeo.png")
 --
 .pull-right[
 ```{r,echo=FALSE,fig.align='center'}
-knitr::include_graphics("img/osgeo2.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 
@@ -221,7 +223,7 @@ Es una máquina virtual basada en **Lubuntu** , que le permite probar una **ampl
 # Instalación de OsgeoLive
  
 ```{r,echo=FALSE,fig.align='center', out.height=480}
-knitr::include_graphics('img/osgeolive.png')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 
 ---
@@ -230,7 +232,7 @@ Es un software libre y de código abierto que se ha convertido en un potente sof
 <br>
 <br>
 ```{r,echo=FALSE,out.width = "660px",fig.align='center'}
-knitr::include_graphics('img/qgis.gif')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 ---
 # Características de QGIS
@@ -251,7 +253,7 @@ knitr::include_graphics('img/qgis.gif')
 * Presenta una comunidad académica y científica muy dinámica.
 
 ```{r,echo=FALSE,out.width = "660px",fig.align='center'}
-knitr::include_graphics('img/qgis2.png')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 
 ---
@@ -264,20 +266,20 @@ Entre ellas tenemos a la versión:
 3. **DEV**: Versión de prueba (Se modifica en meses, semanas o días)
 
 ```{r,echo=FALSE,out.width = "660px",fig.align='center'}
-knitr::include_graphics('img/dev.png')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 
 ---
 # Por qué usar QGIS?
 .pull-top[
 ```{r,echo=FALSE,out.width=750,out.height=270,fig.align='center'}
-knitr::include_graphics('img/trends.png')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 ]
 
 .pull-down[
 ```{r,echo=FALSE, out.width=750,out.height=270,fig.align='center'}
-knitr::include_graphics('img/bar.jpg_large')
+knitr::include_graphics('img/california-incendios.jpg')
 ```
 ]
 
@@ -293,14 +295,14 @@ La instalación **depende del sistema operativo (SO)**, para este ejemplo realiz
 .pull-left[
 <center>Instalador autónomo QGIS</center>
 ```{r,echo=FALSE, fig.align='center',out.width=450,out.height=400}
-knitr::include_graphics("img/insta01.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 
 .pull-right[
 <center>Instalador de red OSGeo4W</center>
 ```{r, echo=FALSE,fig.align='center',out.width=750,out.height=450}
-knitr::include_graphics("img/insta02.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 
@@ -308,21 +310,21 @@ knitr::include_graphics("img/insta02.png")
 # Componentes de la Interfaz Gráfica de Usuario(**GUI**) de QGIS
 
 ```{r, echo=FALSE,out.width=970,out.height=500}
-knitr::include_graphics("img/gui.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
 # Explorando los componentes que presenta la barra de menú
 
 ```{r, echo=FALSE,out.width=950,out.height=450,fig.align='center'}
-knitr::include_graphics("img/menu.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
 # Explorarando la caja de herramientas o toolbox de QGIS
 
 ```{r, echo=FALSE,out.width=950,out.height=450,fig.align='center'}
-knitr::include_graphics("img/toolbox.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -333,7 +335,7 @@ Los plugins son herramientas o módulos adicionales que sirven para realizar tar
 Los lenguajes de programación que son empleados por los usuarios para crear plugins de QGIS incluyen a los lenguajes de programación como C++ y **Python**.
 
 ```{r, echo=FALSE,out.width=400,out.height=200,fig.align='center'}
-knitr::include_graphics("img/pyton.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ]
@@ -341,7 +343,7 @@ knitr::include_graphics("img/pyton.png")
 .pull-right[
 
 ```{r, echo=FALSE,out.width="400px",out.height="400",fig.align='center'}
-knitr::include_graphics("img/plugin.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ]
@@ -350,7 +352,7 @@ knitr::include_graphics("img/plugin.png")
 # Cómo instalar un plugin?  
 
 ```{r, echo=FALSE,out.width=950,out.height=450,fig.align='center'}
-knitr::include_graphics("img/installingplugin.gif")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ---
@@ -363,14 +365,14 @@ Load QSS es un plugin de QGIS que permite personalizar la apariencia de la inter
 <br>
 
 ```{r, echo=FALSE,out.width="250px",out.height="150",fig.align='center'}
-knitr::include_graphics("img/personalizacion.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 
 .pull-right[
 
 ```{r, echo=FALSE,out.width=700,out.height=250,fig.align='right'}
-knitr::include_graphics("img/personalizacion2.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 ]
 <br>
@@ -382,7 +384,7 @@ En las versiones últimas de **QGIS** como la 3.4 y 3.8 presentan dos tipos de e
 # Propina 🗺️
 
 ```{r, echo=FALSE,fig.align='center', out.height= 420}
-knitr::include_graphics("img/paper.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ##### _Mas información_ [Paper aquí](https://www.mdpi.com/2072-4292/8/5/413)
@@ -391,7 +393,7 @@ knitr::include_graphics("img/paper.png")
 # Mi primer proyecto en QGIS
 
 ```{r, echo=FALSE,out.width=940, out.height=450, fig.align='center'}
-knitr::include_graphics("img/MiprimerProject.png")
+knitr::include_graphics("img/california-incendios.jpg")
 ```
 
 ##### _Insumos_ [click aquí](https://github.com/barja8/OsgeoLiveUNMSM/raw/master/Sesi%C3%B3n01/Insumos/MapaBase.tar)
