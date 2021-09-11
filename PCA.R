@@ -268,7 +268,7 @@ data2 <- dplyr::bind_cols(pca_data, cluster = as.numeric(clust))
 
 #visualizando en 3d
 library(plotly)
-fig <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+hmodel3d <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
                marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
 print(fig)
 
@@ -302,7 +302,7 @@ table(hkmodel$cluster)
 library(plotly)
 datahk <- dplyr::bind_cols(hkmodel$data, cluster = as.numeric(clust))
 
-fig <- plot_ly(datahk, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+hkmodel <- plot_ly(datahk, x = ~Axis1, y = ~Axis2, z = ~Axis3,
                marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
 print(fig)
 
