@@ -137,3 +137,100 @@ pca$c1
 fviz_eig(pca,addlabels = T)
 ```
 
+## CLUSTER JERARQUICO
+
+#Matriz de distancias
+```{r}
+distancia<- dist(pca_data, method = "euclidean")
+d <- as.matrix(distancia)
+```
+
+#Heatmap
+```{r}
+heatmap(d)
+fviz_dist(dist.obj = distancia, lab_size = 10, 
+          gradient = list(low = "#FC4E07", mid = "white", high = "#00AFBB"))
+```
+
+#clusterizando con el metodo ward
+```{r}
+hmodel<- hclust(distancia, method = "ward.D")
+```
+
+#dendograma
+```{r}
+plot(hmodel)
+```
+
+#obteniendo las alturas
+```{r}
+names <- "height"
+heights <- as.data.frame(hmodel$height) #hay 28 alturas
+```
+
+#ploteando las alturas
+```{r}
+ggplot(heights, aes(x = index(heights), y = hmodel$height)) +
+  geom_line(color = "royalblue2",    # Color de la linea
+            lwd = 1,      # Ancho de la linea
+            linetype = 1) +
+  geom_vline(xintercept=30, color = "orange") +
+  geom_point(color = "royalblue4")+ labs( x = "Observaciones", y = "Altura",
+          title ="VisualizaciÃ³n de alturas")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+#Obteniendo el valor de la altura
+```{r}
+(hmodel$height)[30]
+```
+
+#cortando el dendograma
+```{r}
+clust<- cutree(hmodel, k = 3)
+length(clust)
+```
+
+#numero de elementos en cada cluster
+```{r}
+table(clust)
+```
+
+#visualizando los grupo en el dendograma
+```{r}
+fviz_dend(hmodel, k = 3, # Cortar en 4 grupos
+          cex = 0.5, # Tamaño de las etiquetas
+          k_colors = c("#2E9FDF", "#00AFBB", "#E7B800"),
+          color_labels_by_k = TRUE, # color labels by groups
+          rect = TRUE, # Add rectangle around groups
+          rect_border = c("#2E9FDF", "#00AFBB", "#E7B800"),
+          rect_fill = TRUE)
+```
+
+#visualizando los grupos
+```{r}
+fviz_cluster(list(data = pca_data, cluster = clust),
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"),
+             ellipse.type = "convex", # Concentration ellipse
+             repel = TRUE, # Avoid label overplotting (slow)
+             show.clust.cent = TRUE, ggtheme = theme_minimal()
+)
+```
+
+```{r}
+library(cluster)
+```
+
+#boxplot, caracterizacion de clusters
+```{r}
+col <- c("#2E9FDF", "#00AFBB", "#E7B800")
+data2 <- dplyr::bind_cols(pca_data, cluster = as.numeric(clust))
+```
+
+#visualizando en 3d
+```{r}
+library(plotly)
+hmodel3d <- plot_ly(data2, x = ~Axis1, y = ~Axis2, z = ~Axis3,
+               marker = list(color = ~cluster, colorscale = c('#FFE1A1', '#683531'), showscale = FALSE))
+print(fig)
+```
