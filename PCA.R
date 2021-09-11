@@ -115,6 +115,7 @@ corrplot(contrib,
          is.corr = F)
 
 
+
 as.tibble(fires_esc)
 head(pca$li) 
 dim(pca$li)
